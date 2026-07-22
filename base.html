@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Seedance Router{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">Seedance Router<span>Credential pool</span></div>
+    <nav class="nav">
+      <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' }}">Overview</a>
+      <a href="{{ url_for('generate') }}" class="{{ 'active' if request.endpoint == 'generate' }}">Generate</a>
+      <a href="{{ url_for('jobs_list') }}" class="{{ 'active' if request.endpoint == 'jobs_list' }}">Jobs</a>
+      <a href="{{ url_for('credentials_list') }}" class="{{ 'active' if request.endpoint == 'credentials_list' }}">Credentials</a>
+      <a href="{{ url_for('models_page') }}" class="{{ 'active' if request.endpoint == 'models_page' }}">Models</a>
+    </nav>
+    <div class="sidebar-foot">
+      {{ session.get('user') }} · <a href="{{ url_for('logout') }}">Sign out</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+</body>
+</html>

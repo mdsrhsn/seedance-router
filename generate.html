@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Generate · Seedance Router{% endblock %}
+
+{% block content %}
+<h1>Generate</h1>
+<p class="subtitle">Jobs enter the queue. The worker assigns a key and submits.</p>
+
+<div class="panel">
+  <form method="post">
+    <div class="field">
+      <label for="prompt">Prompt</label>
+      <textarea id="prompt" name="prompt" required placeholder="Describe the shot"></textarea>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="model_id">Model</label>
+        <select id="model_id" name="model_id" required>
+          {% for m in models %}
+            <option value="{{ m.model_id }}">{{ m.display_name }} — {{ '%.2f'|format(m.estimated_cost|float) }}</option>
+          {% else %}
+            <option value="">Add a model first</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="resolution">Resolution</label>
+        <select id="resolution" name="resolution">
+          <option>480p</option><option selected>720p</option><option>1080p</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="duration">Duration (seconds)</label>
+        <input id="duration" name="duration" type="number" value="5" min="1" max="15">
+      </div>
+      <div class="field">
+        <label for="count">How many</label>
+        <input id="count" name="count" type="number" value="1" min="1" max="20">
+      </div>
+    </div>
+    <div class="field">
+      <label for="image_url">Reference image URL</label>
+      <input id="image_url" name="image_url" placeholder="Only for image, frame, or reference workflows">
+    </div>
+    <button type="submit">Queue generation</button>
+  </form>
+</div>
+
+<h2>Pool right now</h2>
+<div class="panel" style="padding:18px 0 4px">
+  <table>
+    <thead><tr><th>Key</th><th>Quota</th><th>Priority</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for c in credentials %}
+      <tr>
+        <td>{{ c.label }}</td>
+        <td class="num">{{ '%.2f'|format(c.quota_remaining|float) }}</td>
+        <td class="num">{{ c.priority }}</td>
+        <td><span class="pill {{ c.status }}">{{ c.status }}</span></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="empty">No keys in the pool.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

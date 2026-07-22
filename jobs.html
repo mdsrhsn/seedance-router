@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Jobs · Seedance Router{% endblock %}
+
+{% block content %}
+<h1>Jobs</h1>
+<p class="subtitle">Every generation, and which key ran it.</p>
+
+<div class="panel" style="padding:14px 20px">
+  <div class="actions">
+    {% for s in ['', 'queued', 'running', 'succeeded', 'failed', 'blocked'] %}
+      <a class="btn {{ '' if status_filter == s else 'ghost' }}"
+         style="{{ 'background:transparent;color:var(--muted);border:1px solid var(--line)' if status_filter != s else '' }}"
+         href="{{ url_for('jobs_list', status=s) }}">{{ s or 'All' }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="panel" style="padding:18px 0 4px">
+  {% if jobs %}
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Prompt</th><th>Model</th><th>Key</th><th>Status</th><th>Cost</th><th>Output</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for job in jobs %}
+      <tr>
+        <td class="num">{{ job.id }}</td>
+        <td class="trunc">
+          {{ job.prompt }}
+          {% if job.error %}<div class="note" style="color:var(--danger)">{{ job.error }}</div>{% endif %}
+        </td>
+        <td style="color:var(--muted)">{{ job.model_id }}</td>
+        <td>{{ labels.get(job.credential_id, '—') }}</td>
+        <td><span class="pill {{ job.status }}">{{ job.status }}</span></td>
+        <td class="num">{{ '%.2f'|format(job.estimated_cost|float) }}</td>
+        <td>{% if job.output_url %}<a href="{{ job.output_url }}" target="_blank" rel="noopener">Open</a>{% else %}—{% endif %}</td>
+        <td>
+          {% if job.status in ['failed', 'blocked'] %}
+          <form method="post" action="{{ url_for('jobs_requeue', job_id=job.id) }}">
+            <button class="ghost small" type="submit">Retry</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <div class="empty">Nothing here yet.</div>
+  {% endif %}
+</div>
+{% endblock %}

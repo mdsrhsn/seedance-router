@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Overview · Seedance Router{% endblock %}
+
+{% block content %}
+<h1>Overview</h1>
+<p class="subtitle">Where the pool stands right now.</p>
+
+<div class="stats">
+  <div class="stat">
+    <div class="label">Keys available</div>
+    <div class="value {{ 'danger' if totals.available == 0 else '' }}">{{ totals.available }}<span style="color:var(--muted);font-size:14px"> / {{ totals.keys }}</span></div>
+  </div>
+  <div class="stat">
+    <div class="label">Largest single balance</div>
+    <div class="value {{ 'warn' if totals.largest < low_threshold else '' }}">{{ '%.2f'|format(totals.largest) }}</div>
+  </div>
+  <div class="stat">
+    <div class="label">Total across keys</div>
+    <div class="value">{{ '%.2f'|format(totals.quota) }}</div>
+  </div>
+  <div class="stat">
+    <div class="label">Running</div>
+    <div class="value">{{ totals.running }}</div>
+  </div>
+  <div class="stat">
+    <div class="label">Queued</div>
+    <div class="value">{{ totals.queued }}</div>
+  </div>
+  <div class="stat">
+    <div class="label">Blocked</div>
+    <div class="value {{ 'warn' if totals.blocked else '' }}">{{ totals.blocked }}</div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2 style="margin-top:0">Balance per key</h2>
+  <p class="note" style="margin:-6px 0 16px">
+    A job runs entirely on one key. Read each bar on its own — the total is not
+    spendable on a single generation.
+  </p>
+
+  {% if credentials %}
+    {% set ceiling = [totals.largest, 1]|max %}
+    <div class="cascade">
+      {% for c in credentials %}
+        {% set quota = c.quota_remaining|float %}
+        <div class="tank">
+          <div class="name">
+            {{ c.label }}
+            <small>priority {{ c.priority }} · {{ c.in_flight }}/{{ c.max_concurrent }} in flight</small>
+          </div>
+          <div class="bar">
+            <div class="fill {{ 'empty' if quota <= 0 else ('low' if quota < low_threshold else '') }}"
+                 style="width: {{ (quota / ceiling * 100)|round(1) }}%"></div>
+          </div>
+          <div class="amount">{{ '%.2f'|format(quota) }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty">No credentials yet. <a href="{{ url_for('credentials_list') }}">Add your first key</a>.</div>
+  {% endif %}
+</div>
+
+<h2>Recent jobs</h2>
+<div class="panel" style="padding:18px 0 4px">
+  {% if recent %}
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Prompt</th><th>Key</th><th>Status</th><th>Created</th></tr>
+    </thead>
+    <tbody>
+      {% for job in recent %}
+      <tr>
+        <td class="num">{{ job.id }}</td>
+        <td class="trunc">{{ job.prompt }}</td>
+        <td>{{ job.credential.label if job.credential else '—' }}</td>
+        <td><span class="pill {{ job.status }}">{{ job.status }}</span></td>
+        <td class="num">{{ job.created_at.strftime('%b %d, %H:%M') if job.created_at }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <div class="empty">Nothing has run yet. <a href="{{ url_for('generate') }}">Queue a generation</a>.</div>
+  {% endif %}
+</div>
+{% endblock %}
