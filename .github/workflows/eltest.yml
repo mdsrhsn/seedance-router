@@ -1,0 +1,21 @@
+name: elevenlabs-video-test
+on:
+  push:
+    branches: [el-video-test]
+    paths: [gen.py, .github/workflows/eltest.yml]
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install requests
+      - run: python gen.py
+        env:
+          XI_KEY: ${{ secrets.ELEVEN_LABS_SEEDANCE }}
+      - if: always()
+        run: |
+          git config user.name "kf-bot"; git config user.email "bot@users.noreply.github.com"
+          git add out/ && git commit -m "result" && git push || true
