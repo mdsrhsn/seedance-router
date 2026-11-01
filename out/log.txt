@@ -1,0 +1,6 @@
+POST bytedance-seedance-v2.5 422 {"detail":[{"type":"extra_forbidden","loc":["body","bytedance-seedance-v2.5","duration"],"msg":"Extra inputs are not permitted","input":10}]}
+POST-min bytedance-seedance-v2.5 401 {"detail":{"type":"authentication_error","code":"unauthorized","message":"Invalid API key","status":"invalid_api_key","request_id":"6c2fd11ffbd8b8c42fc640c8dc463203"}}
+POST bytedance-seedance-v2 422 {"detail":[{"type":"extra_forbidden","loc":["body","bytedance-seedance-v2","duration"],"msg":"Extra inputs are not permitted","input":10}]}
+POST-min bytedance-seedance-v2 401 {"detail":{"type":"authentication_error","code":"unauthorized","message":"Invalid API key","status":"invalid_api_key","request_id":"5d26ccb35b125e77a7c7acb82ab2a8e5"}}
+POST veo-3.1-fast-generate-001 422 {"detail":[{"type":"extra_forbidden","loc":["body","veo-3.1-fast-generate-001","duration"],"msg":"Extra inputs are not permitted","input":8}]}
+POST-min veo-3.1-fast-generate-001 401 {"detail":{"type":"authentication_error","code":"unauthorized","message":"Invalid API key","status":"invalid_api_key","request_id":"2984929c944bec093a0eea3e67959087"}}
