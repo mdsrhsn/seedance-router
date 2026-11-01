@@ -1,6 +1,7 @@
 import os, json, time, requests, sys
-K = os.environ.get("XI_KEY", "")
-print("key present:", bool(K), "len", len(K))
+RAW = os.environ.get("XI_KEY", "")
+K = RAW.strip().strip('"').strip("'").strip()
+print("key len raw", len(RAW), "clean", len(K), "starts sk_", K.startswith("sk_"))
 H = {"xi-api-key": K, "Content-Type": "application/json"}
 B = "https://api.elevenlabs.io/v1/flows/video"
 PROMPT = ("Cinematic 10-second shot: a footballer in a navy and gold kit juggles a ball on a "
@@ -13,6 +14,11 @@ tries = [
     ("bytedance-seedance-v2", {"duration": 10, "resolution": "720p", "aspect_ratio": "16:9"}),
     ("veo-3.1-fast-generate-001", {"duration": 8, "aspect_ratio": "16:9"}),
 ]
+L("keyinfo rawlen", len(RAW), "cleanlen", len(K), "sk_", K.startswith("sk_"))
+for f,v in [("duration_seconds",10),("seconds",10),("length",10),("duration_s",10),("video_duration",10),("resolution","720p"),("aspect_ratio","16:9"),("generate_audio",True),("audio_enabled",True),("enable_audio",True),("text",PROMPT),("negative_prompt","x")]:
+    r = requests.post(B, headers=H, json={"model_id":"bytedance-seedance-v2.5","prompt":PROMPT,f:v}, timeout=60)
+    L("probe", f, r.status_code, r.text[:300])
+r = requests.get("https://api.elevenlabs.io/v1/models", headers=H, timeout=60); L("models", r.status_code, r.text[:200])
 gid = None
 for model, extra in tries:
     body = {"model_id": model, "prompt": PROMPT, **extra}
